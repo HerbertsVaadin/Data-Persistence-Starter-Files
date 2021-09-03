@@ -8,13 +8,13 @@ using Random = UnityEngine.Random;
 
 public class MainManager : MonoBehaviour
 {
-    private static MainManager INSTANCE;
-    
+
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text HighScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -23,21 +23,11 @@ public class MainManager : MonoBehaviour
     private bool m_GameOver = false;
 
 
-    private void Awake()
-    {
-        if (INSTANCE != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        INSTANCE = this;
-        DontDestroyOnLoad(gameObject);
-    }
 
     // Start is called before the first frame update
     void Start()
     {
+        UpdateHighScoreText();
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -51,6 +41,19 @@ public class MainManager : MonoBehaviour
                 brick.PointValue = pointCountArray[i];
                 brick.onDestroyed.AddListener(AddPoint);
             }
+        }
+    }
+
+    private void UpdateHighScoreText()
+    {
+        HighScoreManager.HighScore highScore = HighScoreManager.INSTANCE.GetCurrentHighScore();
+        if (highScore == null)
+        {
+            HighScoreText.text = "Best Score : None";
+        }
+        else
+        {
+            HighScoreText.text = "Best Score : " + highScore.userName + " : " + highScore.score;
         }
     }
 
@@ -88,5 +91,7 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        HighScoreManager.INSTANCE.RecordScore(m_Points);
+        UpdateHighScoreText();
     }
 }

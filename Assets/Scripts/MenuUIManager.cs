@@ -8,18 +8,6 @@ using UnityEditor;
 
 public class MenuUIManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-    
     public void LoadGame()
     {
         SceneManager.LoadScene(1);
@@ -32,5 +20,10 @@ public class MenuUIManager : MonoBehaviour
 #else
         Application.Quit(); // original code to quit Unity player
 #endif
+    }
+
+    public void UpdateUserName(string userName)
+    {
+        HighScoreManager.INSTANCE.SetUserName(userName);
     }
 }
