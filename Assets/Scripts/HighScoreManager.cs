@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class HighScoreManager : MonoBehaviour
 {
     public static HighScoreManager INSTANCE;
+    private string saveDataPath;
     private string userName;
     private HighScore currentHighScore;
     
@@ -19,6 +21,7 @@ public class HighScoreManager : MonoBehaviour
 
         INSTANCE = this;
         DontDestroyOnLoad(gameObject);
+        LoadHighScore();
     }
 
     public string GetUserName()
@@ -41,7 +44,6 @@ public class HighScoreManager : MonoBehaviour
 
         if (currentHighScore == null || currentHighScore.score < score)
         {
-            Debug.Log("Recording score: " + score + " for user: " + GetUserName());
             SetNewHighScore(score);
             return true;
         }
@@ -52,6 +54,35 @@ public class HighScoreManager : MonoBehaviour
     private void SetNewHighScore(int score)
     {
         currentHighScore = new HighScore(GetUserName(), score);
+        StoreHighScore();
+    }
+
+    private void LoadHighScore()
+    {
+        if (File.Exists(GetSaveDataPath()))
+        {
+            currentHighScore = JsonUtility.FromJson<HighScore>(File.ReadAllText(GetSaveDataPath()));
+        }
+    }
+
+    private void StoreHighScore()
+    {
+        if (currentHighScore == null)
+        {
+            return;
+        }
+        
+        File.WriteAllText(GetSaveDataPath(), JsonUtility.ToJson(currentHighScore));
+    }
+    
+    string GetSaveDataPath()
+    {
+        if (saveDataPath == null)
+        {
+            saveDataPath = Application.persistentDataPath + "/savefile.json";
+        }
+
+        return saveDataPath;
     }
 
     [Serializable]
